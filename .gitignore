@@ -1,0 +1,28 @@
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Testing
+.pytest_cache/
+.allure_results/
+.allure_report/
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Project specific
+screenshots/
+test_results/
+reports/
