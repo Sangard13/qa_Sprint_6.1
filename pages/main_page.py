@@ -1,4 +1,5 @@
 import allure
+from selenium.webdriver.common.by import By
 from pages.base_page import BasePage
 from locators.main_locators import MainLocators
 
@@ -15,19 +16,13 @@ class MainPage(BasePage):
     @allure.step("Нажать на кнопку 'Заказать' в {button_type}")
     def click_order_btn(self, button_type):
         if button_type == "top":
-            # Прокручиваем к верхней кнопке и кликаем
             self.scroll_to_element(MainLocators.HEADER_ORDER_BUTTON)
-            self.wait_for_element_clickable(MainLocators.HEADER_ORDER_BUTTON)
+            self.wait_for_element_visible(MainLocators.HEADER_ORDER_BUTTON)
             self.click_element(MainLocators.HEADER_ORDER_BUTTON)
         else:
-            # Прокручиваем к нижней кнопке и кликаем
             self.scroll_to_element(MainLocators.FOOTER_ORDER_BUTTON)
-            self.wait_for_element_clickable(MainLocators.FOOTER_ORDER_BUTTON)
+            self.wait_for_element_visible(MainLocators.FOOTER_ORDER_BUTTON)
             self.click_element(MainLocators.FOOTER_ORDER_BUTTON)
-
-        # Ждем загрузки формы заказа
-        from locators.order_page_locators import OrderPageLocators
-        self.wait_for_element_visible(OrderPageLocators.NAME)
 
     @allure.step("Нажать на логотип Самоката")
     def click_scooter_logo(self):
@@ -42,10 +37,7 @@ class MainPage(BasePage):
         question_locator = (MainLocators.QUESTION[0], MainLocators.QUESTION[1].format(index))
         self.scroll_to_element(question_locator)
         self.click_element(question_locator)
-
-        # Ждем раскрытия ответа
-        answer_locator = (MainLocators.ANSWER[0], MainLocators.ANSWER[1].format(index))
-        self.wait_for_element_visible(answer_locator)
+        self.wait_for_element_visible((MainLocators.ANSWER[0], MainLocators.ANSWER[1].format(index)))
 
     @allure.step("Получить текст ответа для вопроса {index}")
     def get_answer_text(self, index):
@@ -54,4 +46,29 @@ class MainPage(BasePage):
 
     @allure.step("Проверить, что текущая страница - главная")
     def is_main_page(self):
-        return self.get_current_url() == self.base_url + "/"
+        return self.driver.current_url == self.base_url + "/"
+
+    @allure.step("Проверить, что URL содержит 'dzen.ru'")
+    def is_dzen_page(self):
+        return "dzen.ru" in self.driver.current_url
+
+    @allure.step("Закрыть модальное окно на главной странице")
+    def close_modal_window(self):
+        """Закрывает возможные модальные окна на главной странице"""
+        modal_selectors = [
+            (By.XPATH, "//button[contains(@class, 'Modal_Close')]"),
+            (By.XPATH, "//button[contains(@class, 'modal__close')]"),
+            (By.XPATH, "//button[@aria-label='Закрыть']"),
+            (By.CSS_SELECTOR, "[data-testid='modal-close']"),
+        ]
+
+        for selector in modal_selectors:
+            try:
+                self.click_element(selector)
+                allure.attach(f"Закрыто модальное окно с селектором: {selector}", "Успех")
+                return True
+            except:
+                continue
+
+        allure.attach("Модальные окна не найдены", "Информация")
+        return False

@@ -1,5 +1,5 @@
-import pytest
 import allure
+import pytest
 from pages.main_page import MainPage
 from pages.order_page import OrderPage
 from data import OrderData
@@ -29,33 +29,40 @@ class TestOrderScooter:
     @allure.title("Проверка перехода по логотипу Самоката")
     def test_scooter_logo_redirect(self, driver):
         main_page = MainPage(driver)
+        order_page = OrderPage(driver)
+
         main_page.open_main_page()
-
+        main_page.click_order_btn("top")
         main_page.click_scooter_logo()
-
         assert main_page.is_main_page()
 
-    @allure.title("Проверка перехода по логотипу Яндекса")
+    @allure.title("Проверка перехода по логотипу Яндекса на главную Дзен")
     def test_yandex_logo_redirect(self, driver):
         main_page = MainPage(driver)
         main_page.open_main_page()
 
-        # Используем метод BasePage вместо прямого вызова driver
+        # УБИРАЕМ вызов close_modal_window() - он может вызывать появление модального окна
+        # main_page.close_modal_window()  # ЗАКОММЕНТИРОВАТЬ эту строку!
+
         main_window = main_page.get_current_window_handle()
 
+        # Кликаем на логотип
         main_page.click_yandex_logo()
 
-        # Используем методы BasePage для работы с окнами
+        # Ждем новое окно и переключаемся
         main_page.wait_for_new_window()
         new_window = main_page.get_new_window_handle(main_window)
         main_page.switch_to_window(new_window)
 
-        # Используем методы BasePage для ожидания URL
+        # Ждем загрузки Дзен
         main_page.wait_for_url_contains("dzen.ru")
+
+        # Получаем финальный URL
         current_url = main_page.get_current_url()
 
-        # Используем методы BasePage для закрытия окна и возврата
+        # Возвращаемся
         main_page.close_current_window()
         main_page.switch_to_window(main_window)
 
-        assert "dzen.ru" in current_url
+        # Проверяем переход на Дзен
+        assert "dzen.ru" in current_url, f"Ожидался переход на dzen.ru, но получен: {current_url}"

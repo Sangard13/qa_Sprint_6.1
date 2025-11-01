@@ -23,3 +23,7 @@ class OrderPageLocators:
     # Модальные окна
     CONFIRM_BUTTON = (By.XPATH, "//button[text()='Да']")
     SUCCESS_TITLE = (By.CLASS_NAME, "Order_ModalHeader__3FDaJ")
+
+    # Общие локаторы
+    PAGE_LOAD_INDICATOR = ".App_App__15LM-"
+    LOADING_SPINNER = ".Loader_Loader__2S1g1"
